@@ -7,3 +7,5 @@ email-validator==2.2.0
 requests==2.32.3
 Pillow==11.1.0
 python-dotenv==1.0.1
+gunicorn==23.0.0
+
