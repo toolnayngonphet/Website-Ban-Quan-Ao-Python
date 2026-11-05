@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Giới Thiệu - FASHION STORE Đồ Án Python Nâng Cao{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold mb-2">ĐỒ ÁN MÔN HỌC</span>
+        <h1 class="fw-bold">LẬP TRÌNH PYTHON NÂNG CAO</h1>
+        <p class="text-muted lead">Khoa Công Nghệ Thông Tin – Trường Đại Học Văn Lang</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i> Thông Tin Học Phần</h4>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 py-2 d-flex justify-content-between">
+                        <span class="text-muted">Môn học:</span>
+                        <span class="fw-semibold">Lập trình Python nâng cao (71ITSE31003)</span>
+                    </li>
+                    <li class="list-group-item px-0 py-2 d-flex justify-content-between">
+                        <span class="text-muted">Giảng viên hướng dẫn:</span>
+                        <span class="fw-semibold">ThS. Nguyễn Thị Mỹ Linh</span>
+                    </li>
+                    <li class="list-group-item px-0 py-2 d-flex justify-content-between">
+                        <span class="text-muted">Đề tài:</span>
+                        <span class="fw-semibold text-danger">Website Bán Quần Áo Thời Trang (Fashion Store)</span>
+                    </li>
+                    <li class="list-group-item px-0 py-2 d-flex justify-content-between">
+                        <span class="text-muted">Cơ sở dữ liệu:</span>
+                        <span class="fw-semibold">SQLite (Flask-SQLAlchemy)</span>
+                    </li>
+                    <li class="list-group-item px-0 py-2 d-flex justify-content-between">
+                        <span class="text-muted">Lập trình mạng (CLO3):</span>
+                        <span class="fw-semibold">API VietQR & REST API JSON</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold text-success mb-3"><i class="bi bi-people me-2"></i> Phân Công Nhóm 3 Thành Viên</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm small align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Thành viên</th>
+                                <th>Nhiệm vụ chính</th>
+                                <th>Đóng góp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Thành viên 1</strong><br><span class="text-muted">Nhóm trưởng</span></td>
+                                <td>Kiến trúc dự án, Models CSDL, Quản trị Admin CRUD, upload ảnh Pillow</td>
+                                <td class="text-center fw-bold text-primary">35%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Thành viên 2</strong></td>
+                                <td>Giao diện Jinja2, Bootstrap 5, Web Forms Flask-WTF, giỏ hàng, tìm kiếm & phân trang</td>
+                                <td class="text-center fw-bold text-primary">33%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Thành viên 3</strong></td>
+                                <td>Nghiệp vụ Đặt hàng, tích hợp API VietQR (CLO3), REST API, dịch vụ Flask-Mail</td>
+                                <td class="text-center fw-bold text-primary">32%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hướng dẫn kiểm thử & API -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+        <h4 class="fw-bold mb-3"><i class="bi bi-terminal me-2"></i> Tài Khoản Demo & Kiểm Thử</h4>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="bg-white p-3 rounded-3 border">
+                    <h6 class="fw-bold text-danger"><i class="bi bi-shield-lock me-1"></i> Tài khoản Quản trị (Admin)</h6>
+                    <p class="mb-1 small"><strong>Username:</strong> <code>admin</code></p>
+                    <p class="mb-1 small"><strong>Password:</strong> <code>admin123</code></p>
+                    <small class="text-muted">Có toàn quyền thêm, sửa, xóa sản phẩm, upload ảnh, quản lý danh mục và duyệt đơn hàng.</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-white p-3 rounded-3 border">
+                    <h6 class="fw-bold text-success"><i class="bi bi-person me-1"></i> Tài khoản Khách hàng (Customer)</h6>
+                    <p class="mb-1 small"><strong>Username:</strong> <code>khachhang</code></p>
+                    <p class="mb-1 small"><strong>Password:</strong> <code>123456</code></p>
+                    <small class="text-muted">Dùng để kiểm thử chức năng đặt hàng, xem lịch sử mua và cập nhật hồ sơ cá nhân.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="fw-bold"><i class="bi bi-cloud-arrow-down me-1"></i> Danh sách REST API Endpoints (CLO3):</h6>
+            <ul class="small mb-0">
+                <li><code>GET /api/v1/products</code> - Trả về danh sách sản phẩm JSON (hỗ trợ <code>?category_id=...</code>, <code>?search=...</code>)</li>
+                <li><code>GET /api/v1/products/&lt;id&gt;</code> - Trả về chi tiết 1 sản phẩm JSON</li>
+                <li><code>GET /api/v1/categories</code> - Trả về danh sách danh mục JSON kèm số lượng sản phẩm</li>
+                <li><code>GET /api/v1/orders/&lt;order_code&gt;</code> - Tra cứu thông tin chi tiết đơn hàng JSON</li>
+                <li><code>GET /api/v1/banks</code> - Danh sách các ngân hàng hỗ trợ VietQR lấy qua mạng Internet</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

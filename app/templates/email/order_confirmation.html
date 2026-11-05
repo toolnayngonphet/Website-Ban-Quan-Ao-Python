@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
+        .header { text-align: center; border-bottom: 2px solid #4338ca; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { color: #4338ca; margin: 0; }
+        .order-info { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f1f5f9; color: #475569; }
+        .total { text-align: right; font-size: 18px; font-weight: bold; color: #dc2626; padding-top: 10px; }
+        .footer { text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>FASHION STORE</h2>
+            <p>Xác Nhận Đơn Hàng Thành Công</p>
+        </div>
+
+        <p>Xin chào <strong>{{ order.customer_name }}</strong>,</p>
+        <p>Cảm ơn bạn đã đặt hàng tại Fashion Store! Đơn hàng của bạn đã được tiếp nhận và đang trong quá trình xử lý.</p>
+
+        <div class="order-info">
+            <p><strong>Mã đơn hàng:</strong> {{ order.order_code }}</p>
+            <p><strong>Thời gian đặt:</strong> {{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+            <p><strong>Phương thức thanh toán:</strong> {{ 'Chuyển khoản VietQR' if order.payment_method == 'VIETQR' else 'Tiền mặt khi nhận hàng (COD)' }}</p>
+            <p><strong>Địa chỉ nhận hàng:</strong> {{ order.shipping_address }}</p>
+            <p><strong>Số điện thoại:</strong> {{ order.customer_phone }}</p>
+        </div>
+
+        <h4>Chi Tiết Đơn Hàng:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Phân loại</th>
+                    <th>SL</th>
+                    <th style="text-align: right;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.size }} / {{ item.color }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td style="text-align: right;">{{ "{:,.0f}".format(item.subtotal).replace(',', '.') }} đ</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total">
+            Tổng cộng: {{ "{:,.0f}".format(order.total_amount).replace(',', '.') }} đ
+        </div>
+
+        <div class="footer">
+            <p>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ hotline: 1900 8888 hoặc gửi email về hỗ trợ.</p>
+            <p>&copy; 2026 Fashion Store. Đồ án Lập trình Python nâng cao.</p>
+        </div>
+    </div>
+</body>
+</html>

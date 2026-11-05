@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Sản Phẩm - ADMIN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Quản trị</a></li>
+                    <li class="breadcrumb-item active">Sản phẩm</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-0">Quản Lý Sản Phẩm Thời Trang</h3>
+        </div>
+        <div>
+            <a href="{{ url_for('admin.product_new') }}" class="btn btn-primary rounded-pill px-3 fw-medium">
+                <i class="bi bi-plus-lg me-1"></i> Thêm Sản Phẩm Mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Search & Filter bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+        <form action="{{ url_for('admin.products') }}" method="GET" class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm..." value="{{ search }}">
+            </div>
+            <div class="col-md-4">
+                <select name="category_id" class="form-select">
+                    <option value="">Tất cả danh mục</option>
+                    {% for c in categories %}
+                    <option value="{{ c.id }}" {% if category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100 rounded-3">
+                    <i class="bi bi-search me-1"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table of products -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light small">
+                    <tr>
+                        <th style="width: 70px;">Ảnh</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Danh Mục</th>
+                        <th>Giá Gốc / KM</th>
+                        <th>Kho</th>
+                        <th>Nổi Bật</th>
+                        <th class="text-center" style="width: 150px;">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <img src="{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename='uploads/products/' + product.image_url) }}" 
+                                 class="rounded-3" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <strong class="d-block text-truncate" style="max-width: 250px;">{{ product.name }}</strong>
+                            <small class="text-muted">Size: {{ product.sizes }}</small>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ product.category.name }}</span></td>
+                        <td>
+                            <span class="fw-bold text-danger">{{ product.current_price | currency }}</span>
+                            {% if product.promotional_price %}
+                            <br><small class="text-muted text-decoration-line-through">{{ product.price | currency }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if product.stock > 10 %}
+                                <span class="badge bg-success-subtle text-success">{{ product.stock }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ product.stock }} (Sắp hết)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if product.is_featured %}
+                                <i class="bi bi-star-fill text-warning" title="Nổi bật"></i>
+                            {% else %}
+                                <i class="bi bi-star text-muted"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('main.product_detail', slug=product.slug) }}" target="_blank" class="btn btn-sm btn-light" title="Xem trên web">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                            <a href="{{ url_for('admin.product_edit', id=product.id) }}" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <form action="{{ url_for('admin.product_delete', id=product.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này không?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">Không tìm thấy sản phẩm nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang admin -->
+        {% if pagination.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.products', page=pagination.prev_num, search=search, category_id=category_id) }}">Trước</a>
+                </li>
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('admin.products', page=page_num, search=search, category_id=category_id) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.products', page=pagination.next_num, search=search, category_id=category_id) }}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

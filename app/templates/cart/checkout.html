@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh Toán Đơn Hàng - FASHION STORE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('cart.view_cart') }}" class="text-decoration-none">Giỏ hàng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
+        </ol>
+    </nav>
+
+    <h3 class="fw-bold mb-4">Thông Tin Đặt Hàng & Thanh Toán</h3>
+
+    <form method="POST" action="{{ url_for('cart.checkout') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="row g-4">
+            <!-- Thông tin giao hàng -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold mb-3 text-primary d-flex align-items-center">
+                        <i class="bi bi-geo-alt-fill me-2"></i> 1. Thông Tin Người Nhận
+                    </h5>
+
+                    <div class="mb-3">
+                        {{ form.customer_name.label(class="form-label fw-semibold small") }}
+                        {{ form.customer_name(class="form-control rounded-3" + (" is-invalid" if form.customer_name.errors else ""), placeholder="Họ và tên người nhận") }}
+                        {% for error in form.customer_name.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.customer_email.label(class="form-label fw-semibold small") }}
+                            {{ form.customer_email(class="form-control rounded-3" + (" is-invalid" if form.customer_email.errors else ""), placeholder="Email nhận hóa đơn") }}
+                            {% for error in form.customer_email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.customer_phone.label(class="form-label fw-semibold small") }}
+                            {{ form.customer_phone(class="form-control rounded-3" + (" is-invalid" if form.customer_phone.errors else ""), placeholder="Số điện thoại giao hàng") }}
+                            {% for error in form.customer_phone.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.shipping_address.label(class="form-label fw-semibold small") }}
+                        {{ form.shipping_address(class="form-control rounded-3" + (" is-invalid" if form.shipping_address.errors else ""), placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành") }}
+                        {% for error in form.shipping_address.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.note.label(class="form-label fw-semibold small") }}
+                        {{ form.note(class="form-control rounded-3", rows="2", placeholder="Ghi chú giao hàng (ví dụ: giao ngoài giờ hành chính...)") }}
+                    </div>
+                </div>
+
+                <!-- Phương thức thanh toán -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold mb-3 text-primary d-flex align-items-center">
+                        <i class="bi bi-credit-card-2-front-fill me-2"></i> 2. Phương Thức Thanh Toán
+                    </h5>
+
+                    <div class="list-group">
+                        <!-- VietQR -->
+                        <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 rounded-3 border mb-2">
+                            <input class="form-check-input flex-shrink-0" type="radio" name="payment_method" value="VIETQR" checked>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="text-dark">Chuyển khoản VietQR Tự Động (Khuyên dùng)</strong>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Miễn phí 0đ</span>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    Hệ thống tự sinh mã QR chuẩn VietQR chính xác số tiền & nội dung đơn hàng. Quét được bằng mọi App ngân hàng (MB, VCB, Techcombank...).
+                                </small>
+                            </div>
+                        </label>
+
+                        <!-- COD -->
+                        <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 rounded-3 border">
+                            <input class="form-check-input flex-shrink-0" type="radio" name="payment_method" value="COD">
+                            <div class="flex-grow-1">
+                                <strong class="text-dark">Thanh toán tiền mặt khi nhận hàng (COD)</strong>
+                                <small class="text-muted d-block mt-1">
+                                    Thanh toán trực tiếp cho shipper khi nhận và kiểm tra hàng tại nhà.
+                                </small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tóm tắt đơn hàng -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+                    <h5 class="fw-bold mb-3">Đơn Hàng Của Bạn ({{ total_qty }})</h5>
+
+                    <div class="overflow-auto mb-3" style="max-height: 260px;">
+                        {% for key, item in cart.items() %}
+                        <div class="d-flex align-items-center gap-3 py-2 border-bottom">
+                            <img src="{{ item.image if item.image.startswith('http') else url_for('static', filename='uploads/products/' + item.image) }}" 
+                                 class="rounded-2" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="flex-grow-1 text-truncate">
+                                <h6 class="mb-0 small fw-bold text-truncate">{{ item.name }}</h6>
+                                <small class="text-muted">{{ item.size }} / {{ item.color }} x {{ item.quantity }}</small>
+                            </div>
+                            <div class="fw-semibold text-danger small">
+                                {{ (item.price * item.quantity) | currency }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-semibold">{{ total_amount | currency }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Phí giao hàng:</span>
+                        <span class="text-success fw-semibold">Miễn phí</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between align-items-baseline mb-4">
+                        <span class="fw-bold">Tổng thanh toán:</span>
+                        <span class="fs-4 fw-extrabold text-danger">{{ total_amount | currency }}</span>
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary btn-lg rounded-pill w-100 fw-bold shadow") }}
+
+                    <div class="text-center mt-3 small text-muted">
+                        <i class="bi bi-lock-fill me-1"></i> Thông tin thanh toán được bảo mật an toàn
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

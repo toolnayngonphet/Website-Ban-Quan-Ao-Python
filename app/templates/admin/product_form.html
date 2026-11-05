@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - ADMIN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Quản trị</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.products') }}">Sản phẩm</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <h4 class="fw-bold mb-4 text-primary d-flex align-items-center">
+                    <i class="bi bi-tag-fill me-2"></i> {{ title }}
+                </h4>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label fw-semibold small") }}
+                        {{ form.name(class="form-control rounded-3" + (" is-invalid" if form.name.errors else ""), placeholder="Ví dụ: Áo Sơ Mi Oxford Cao Cấp") }}
+                        {% for error in form.name.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.category_id.label(class="form-label fw-semibold small") }}
+                            {{ form.category_id(class="form-select rounded-3" + (" is-invalid" if form.category_id.errors else "")) }}
+                            {% for error in form.category_id.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.stock.label(class="form-label fw-semibold small") }}
+                            {{ form.stock(class="form-control rounded-3" + (" is-invalid" if form.stock.errors else ""), placeholder="Số lượng trong kho") }}
+                            {% for error in form.stock.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.price.label(class="form-label fw-semibold small") }}
+                            {{ form.price(class="form-control rounded-3" + (" is-invalid" if form.price.errors else ""), placeholder="Ví dụ: 350000") }}
+                            {% for error in form.price.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.promotional_price.label(class="form-label fw-semibold small") }}
+                            {{ form.promotional_price(class="form-control rounded-3" + (" is-invalid" if form.promotional_price.errors else ""), placeholder="Để trống nếu không giảm giá") }}
+                            {% for error in form.promotional_price.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.sizes.label(class="form-label fw-semibold small") }}
+                            {{ form.sizes(class="form-control rounded-3", placeholder="S, M, L, XL...") }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.colors.label(class="form-label fw-semibold small") }}
+                            {{ form.colors(class="form-control rounded-3", placeholder="Trắng, Đen, Xanh...") }}
+                        </div>
+                    </div>
+
+                    <!-- Upload ảnh xử lý Pillow -->
+                    <div class="mb-3 p-3 bg-light rounded-3 border">
+                        {{ form.image.label(class="form-label fw-semibold small") }}
+                        {{ form.image(class="form-control" + (" is-invalid" if form.image.errors else "")) }}
+                        <small class="text-muted d-block mt-1">Hệ thống tự động sử dụng thư viện <strong>Pillow</strong> để tối ưu dung lượng và cắt chuẩn tỉ lệ ảnh.</small>
+                        {% for error in form.image.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+
+                        {% if product and product.image_url %}
+                        <div class="mt-2">
+                            <span class="small text-muted me-2">Ảnh hiện tại:</span>
+                            <img src="{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename='uploads/products/' + product.image_url) }}" 
+                                 class="rounded border" 
+                                 style="width: 60px; height: 60px; object-fit: cover;">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label fw-semibold small") }}
+                        {{ form.description(class="form-control rounded-3", rows="4", placeholder="Mô tả chất liệu, form dáng, xuất xứ...") }}
+                    </div>
+
+                    <div class="form-check mb-4">
+                        {{ form.is_featured(class="form-check-input") }}
+                        {{ form.is_featured.label(class="form-check-label fw-medium") }}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.products') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                            Hủy
+                        </a>
+                        {{ form.submit(class="btn btn-primary rounded-pill px-5 fw-bold shadow") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

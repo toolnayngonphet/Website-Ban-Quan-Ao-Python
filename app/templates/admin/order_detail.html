@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Chi Tiết Đơn Hàng #{{ order.order_code }} - ADMIN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Quản trị</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.orders') }}">Đơn hàng</a></li>
+            <li class="breadcrumb-item active">{{ order.order_code }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Thông tin chi tiết & Danh sách món đồ -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h5 class="fw-bold mb-0">Đơn Hàng #{{ order.order_code }}</h5>
+                    <span class="text-muted small">Thời gian: {{ order.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Sản Phẩm</th>
+                                <th>Phân Loại</th>
+                                <th>Đơn Giá</th>
+                                <th>Số Lượng</th>
+                                <th class="text-end">Tạm Tính</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                            <tr>
+                                <td><strong>{{ item.product_name }}</strong></td>
+                                <td><span class="badge bg-light text-secondary border">{{ item.size }} / {{ item.color }}</span></td>
+                                <td>{{ item.price | currency }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="text-end fw-bold text-danger">{{ item.subtotal | currency }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold fs-6">Tổng tiền thanh toán:</td>
+                                <td class="text-end fw-extrabold text-danger fs-5">{{ order.total_amount | currency }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if order.note %}
+                <div class="mt-3 p-3 bg-light rounded-3 small">
+                    <strong>Ghi chú của khách:</strong> {{ order.note }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Khách hàng & Cập nhật trạng thái -->
+        <div class="col-lg-4">
+            <!-- Thông tin khách hàng -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-person me-2"></i>Khách Hàng</h6>
+                <p class="mb-1 small"><strong>Họ tên:</strong> {{ order.customer_name }}</p>
+                <p class="mb-1 small"><strong>Email:</strong> {{ order.customer_email }}</p>
+                <p class="mb-1 small"><strong>Điện thoại:</strong> {{ order.customer_phone }}</p>
+                <p class="mb-1 small"><strong>Địa chỉ:</strong> {{ order.shipping_address }}</p>
+                <p class="mb-0 small"><strong>Phương thức:</strong> {{ order.payment_method }}</p>
+            </div>
+
+            <!-- Cập nhật trạng thái -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-pencil-square me-2"></i>Cập Nhật Trạng Thái</h6>
+                <form action="{{ url_for('admin.order_update_status', id=order.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Trạng Thái Đơn Hàng:</label>
+                        <select name="order_status" class="form-select form-select-sm">
+                            <option value="pending" {% if order.order_status == 'pending' %}selected{% endif %}>Chờ xử lý</option>
+                            <option value="confirmed" {% if order.order_status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+                            <option value="shipping" {% if order.order_status == 'shipping' %}selected{% endif %}>Đang giao hàng</option>
+                            <option value="completed" {% if order.order_status == 'completed' %}selected{% endif %}>Hoàn thành</option>
+                            <option value="cancelled" {% if order.order_status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Trạng Thái Thanh Toán:</label>
+                        <select name="payment_status" class="form-select form-select-sm">
+                            <option value="pending" {% if order.payment_status == 'pending' %}selected{% endif %}>Chưa thanh toán</option>
+                            <option value="paid" {% if order.payment_status == 'paid' %}selected{% endif %}>Đã thanh toán</option>
+                            <option value="failed" {% if order.payment_status == 'failed' %}selected{% endif %}>Thất bại / Hoàn tiền</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill btn-sm fw-bold">
+                        Lưu Cập Nhật
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

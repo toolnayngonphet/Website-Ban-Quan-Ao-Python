@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Trang Chủ - FASHION STORE Thời Trang Đỉnh Cao{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-center text-lg-start mb-4 mb-lg-0">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+                    <i class="bi bi-stars me-1"></i> BỘ SƯU TẬP XUÂN HÈ 2026
+                </span>
+                <h1 class="display-4 fw-extrabold mb-3 lh-sm">
+                    Định Hình Phong Cách Thời Trang Của Riêng Bạn
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Khám phá hơn 100+ mẫu áo quần xu hướng mới nhất: từ Streetwear năng động đến Công sở lịch lãm. Trải nghiệm mua sắm mượt mà cùng thanh toán VietQR thông minh.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{{ url_for('main.shop') }}" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold shadow">
+                        <i class="bi bi-bag-check me-2"></i> Khám Phá Ngay
+                    </a>
+                    <a href="{{ url_for('api.get_products') }}" target="_blank" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                        <i class="bi bi-cpu me-2"></i> Khám Phá API
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80" alt="Fashion Banner" class="img-fluid rounded-4 shadow-lg border border-3 border-white-50" style="max-height: 400px; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Danh mục sản phẩm -->
+<section class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Danh Mục Nổi Bật</h3>
+            <p class="text-muted mb-0">Lựa chọn phong cách phù hợp cho bạn</p>
+        </div>
+        <a href="{{ url_for('main.shop') }}" class="text-decoration-none fw-semibold">Xem tất cả &rarr;</a>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{{ url_for('main.shop') }}" class="category-pill active">
+            <i class="bi bi-grid-fill"></i> Tất Cả
+        </a>
+        {% for cat in categories %}
+        <a href="{{ url_for('main.shop', category=cat.slug) }}" class="category-pill">
+            <i class="bi bi-tag-fill text-primary"></i> {{ cat.name }} ({{ cat.products.count() }})
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Sản phẩm nổi bật (Featured Products) -->
+<section class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold mb-2">HOT TREND</span>
+            <h3 class="fw-bold mb-1">Sản Phẩm Bán Chạy Nhất</h3>
+        </div>
+        <a href="{{ url_for('main.shop') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+            Xem thêm <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for product in featured_products %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 product-card shadow-sm position-relative">
+                {% if product.discount_percent > 0 %}
+                <span class="badge-sale">-{{ product.discount_percent }}%</span>
+                {% endif %}
+                
+                <a href="{{ url_for('main.product_detail', slug=product.slug) }}">
+                    <img src="{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename='uploads/products/' + product.image_url) }}" 
+                         class="card-img-top" 
+                         alt="{{ product.name }}">
+                </a>
+
+                <div class="card-body d-flex flex-column p-3">
+                    <small class="text-muted mb-1">{{ product.category.name }}</small>
+                    <h6 class="card-title fw-bold mb-2 text-truncate">
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="text-dark text-decoration-none">
+                            {{ product.name }}
+                        </a>
+                    </h6>
+
+                    <div class="mt-auto">
+                        <div class="d-flex align-items-baseline gap-2 mb-2">
+                            <span class="text-danger fw-bold fs-6">{{ product.current_price | currency }}</span>
+                            {% if product.promotional_price %}
+                            <span class="text-muted text-decoration-line-through small">{{ product.price | currency }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
+                            <i class="bi bi-eye me-1"></i> Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Banner Ưu Đãi / VietQR Highlight -->
+<section class="container mb-5">
+    <div class="bg-primary text-white rounded-4 p-4 p-md-5 shadow position-relative overflow-hidden" style="background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-3">TÍNH NĂNG ĐỘT PHÁ (CLO3)</span>
+                <h2 class="fw-bold mb-3">Thanh Toán VietQR Tự Động Siêu Tốc</h2>
+                <p class="lead mb-4 text-white-50">
+                    Không cần gõ số tài khoản thủ công! Quét mã QR trực tiếp từ App ngân hàng bất kỳ (MB, Vietcombank, Techcombank...). Hệ thống tự điền đúng số tiền và nội dung đơn hàng.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-warning fs-5"></i> <span>Chính xác 100%</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-warning fs-5"></i> <span>Không mất phí giao dịch</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-warning fs-5"></i> <span>Tự động cập nhật hóa đơn</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                <div class="bg-white p-3 rounded-4 shadow d-inline-block text-dark">
+                    <i class="bi bi-qr-code fs-1 text-primary"></i>
+                    <div class="fw-bold mt-2">VietQR Payment</div>
+                    <small class="text-muted">Quét nhanh mọi ngân hàng</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sản phẩm mới nhất (New Arrivals) -->
+<section class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold mb-2">NEW ARRIVALS</span>
+            <h3 class="fw-bold mb-1">Hàng Mới Về Tuần Này</h3>
+        </div>
+        <a href="{{ url_for('main.shop', sort='newest') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+            Xem thêm <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for product in new_products %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 product-card shadow-sm position-relative">
+                {% if product.discount_percent > 0 %}
+                <span class="badge-sale">-{{ product.discount_percent }}%</span>
+                {% endif %}
+                
+                <a href="{{ url_for('main.product_detail', slug=product.slug) }}">
+                    <img src="{{ product.image_url if product.image_url.startswith('http') else url_for('static', filename='uploads/products/' + product.image_url) }}" 
+                         class="card-img-top" 
+                         alt="{{ product.name }}">
+                </a>
+
+                <div class="card-body d-flex flex-column p-3">
+                    <small class="text-muted mb-1">{{ product.category.name }}</small>
+                    <h6 class="card-title fw-bold mb-2 text-truncate">
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="text-dark text-decoration-none">
+                            {{ product.name }}
+                        </a>
+                    </h6>
+
+                    <div class="mt-auto">
+                        <div class="d-flex align-items-baseline gap-2 mb-2">
+                            <span class="text-danger fw-bold fs-6">{{ product.current_price | currency }}</span>
+                            {% if product.promotional_price %}
+                            <span class="text-muted text-decoration-line-through small">{{ product.price | currency }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-medium">
+                            <i class="bi bi-eye me-1"></i> Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Tiện ích cam kết -->
+<section class="container mb-5 py-4 bg-white rounded-4 border">
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <i class="bi bi-shield-check text-primary fs-1 mb-2"></i>
+            <h6 class="fw-bold">100% Chính Hãng</h6>
+            <small class="text-muted">Chất liệu cao cấp, độ bền vượt trội</small>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-arrow-repeat text-primary fs-1 mb-2"></i>
+            <h6 class="fw-bold">Đổi Trả 7 Ngày</h6>
+            <small class="text-muted">Hỗ trợ đổi size linh hoạt, nhanh gọn</small>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-truck text-primary fs-1 mb-2"></i>
+            <h6 class="fw-bold">Giao Hàng Siêu Tốc</h6>
+            <small class="text-muted">Đóng gói cẩn thận, theo dõi đơn hàng</small>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-headset text-primary fs-1 mb-2"></i>
+            <h6 class="fw-bold">Hỗ Trợ 24/7</h6>
+            <small class="text-muted">Tư vấn tận tình qua hotline & fanpage</small>
+        </div>
+    </div>
+</section>
+{% endblock %}

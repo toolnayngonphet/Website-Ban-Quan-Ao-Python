@@ -1,0 +1,9 @@
+Flask==3.1.0
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.2
+Flask-Login==0.6.3
+Flask-Mail==0.10.0
+email-validator==2.2.0
+requests==2.32.3
+Pillow==11.1.0
+python-dotenv==1.0.1

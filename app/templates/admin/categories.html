@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Danh Mục - ADMIN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Quản trị</a></li>
+            <li class="breadcrumb-item active">Danh mục</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Form thêm danh mục mới -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-folder-plus me-2"></i>Thêm Danh Mục Mới</h5>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label small fw-semibold") }}
+                        {{ form.name(class="form-control rounded-3" + (" is-invalid" if form.name.errors else ""), placeholder="Ví dụ: Giày & Dép") }}
+                        {% for error in form.name.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.description.label(class="form-label small fw-semibold") }}
+                        {{ form.description(class="form-control rounded-3", rows="3", placeholder="Mô tả ngắn về danh mục này...") }}
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary w-100 rounded-pill fw-bold") }}
+                </form>
+            </div>
+        </div>
+
+        <!-- Bảng danh sách danh mục -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold mb-3"><i class="bi bi-folder2-open me-2"></i>Danh Sách Danh Mục Hiện Tại</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên Danh Mục</th>
+                                <th>Slug</th>
+                                <th>Số Sản Phẩm</th>
+                                <th class="text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in categories %}
+                            <tr>
+                                <td>{{ cat.id }}</td>
+                                <td><strong>{{ cat.name }}</strong></td>
+                                <td><code>{{ cat.slug }}</code></td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill">{{ cat.products.count() }} sản phẩm</span>
+                                </td>
+                                <td class="text-center">
+                                    <form action="{{ url_for('admin.category_delete', id=cat.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">Chưa có danh mục nào</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

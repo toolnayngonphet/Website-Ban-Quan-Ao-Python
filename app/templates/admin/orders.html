@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Đơn Hàng - ADMIN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Quản trị</a></li>
+                    <li class="breadcrumb-item active">Đơn hàng</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-0">Quản Lý Đơn Hàng Khách Hàng</h3>
+        </div>
+    </div>
+
+    <!-- Bộ lọc trạng thái -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-sm {% if not current_status %}btn-dark{% else %}btn-light{% endif %} rounded-pill px-3">
+                Tất cả ({{ orders|length }})
+            </a>
+            <a href="{{ url_for('admin.orders', status='pending') }}" class="btn btn-sm {% if current_status == 'pending' %}btn-warning text-dark{% else %}btn-light{% endif %} rounded-pill px-3">
+                Chờ xử lý
+            </a>
+            <a href="{{ url_for('admin.orders', status='confirmed') }}" class="btn btn-sm {% if current_status == 'confirmed' %}btn-primary{% else %}btn-light{% endif %} rounded-pill px-3">
+                Đã xác nhận
+            </a>
+            <a href="{{ url_for('admin.orders', status='shipping') }}" class="btn btn-sm {% if current_status == 'shipping' %}btn-info{% else %}btn-light{% endif %} rounded-pill px-3">
+                Đang giao
+            </a>
+            <a href="{{ url_for('admin.orders', status='completed') }}" class="btn btn-sm {% if current_status == 'completed' %}btn-success{% else %}btn-light{% endif %} rounded-pill px-3">
+                Hoàn thành
+            </a>
+            <a href="{{ url_for('admin.orders', status='cancelled') }}" class="btn btn-sm {% if current_status == 'cancelled' %}btn-danger{% else %}btn-light{% endif %} rounded-pill px-3">
+                Đã hủy
+            </a>
+        </div>
+    </div>
+
+    <!-- Bảng đơn hàng -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light small">
+                    <tr>
+                        <th>Mã Đơn Hàng</th>
+                        <th>Khách Hàng</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Tổng Tiền</th>
+                        <th>Phương Thức</th>
+                        <th>Thanh Toán</th>
+                        <th>Trạng Thái Đơn</th>
+                        <th>Ngày Tạo</th>
+                        <th class="text-center">Chi Tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><strong class="text-primary">{{ order.order_code }}</strong></td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.customer_phone }}</td>
+                        <td class="fw-bold text-danger">{{ order.total_amount | currency }}</td>
+                        <td>
+                            <span class="badge {% if order.payment_method == 'VIETQR' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill">
+                                {{ order.payment_method }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if order.payment_status == 'paid' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill">
+                                {{ 'Đã trả' if order.payment_status == 'paid' else 'Chờ TT' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if order.order_status == 'completed' %}
+                                <span class="badge bg-success rounded-pill">Hoàn thành</span>
+                            {% elif order.order_status == 'shipping' %}
+                                <span class="badge bg-info rounded-pill">Đang giao</span>
+                            {% elif order.order_status == 'confirmed' %}
+                                <span class="badge bg-primary rounded-pill">Đã xác nhận</span>
+                            {% elif order.order_status == 'cancelled' %}
+                                <span class="badge bg-danger rounded-pill">Đã hủy</span>
+                            {% else %}
+                                <span class="badge bg-secondary rounded-pill">Chờ xử lý</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="text-center">
+                            <a href="{{ url_for('admin.order_detail', id=order.id) }}" class="btn btn-sm btn-outline-dark rounded-pill">
+                                Xem & Cập nhật
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">Không có đơn hàng nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

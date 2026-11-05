@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Giỏ Hàng Của Bạn - FASHION STORE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h3 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-cart3 text-primary me-2"></i> Giỏ Hàng Của Bạn 
+        <span class="badge bg-light text-dark rounded-pill fs-6 ms-2">({{ total_qty }} món đồ)</span>
+    </h3>
+
+    {% if cart %}
+    <div class="row g-4">
+        <!-- Danh sách món đồ trong giỏ -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-3">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Sản Phẩm</th>
+                                <th>Đơn Giá</th>
+                                <th>Số Lượng</th>
+                                <th>Thành Tiền</th>
+                                <th class="text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item_key, item in cart.items() %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ item.image if item.image.startswith('http') else url_for('static', filename='uploads/products/' + item.image) }}" 
+                                             alt="{{ item.name }}" 
+                                             class="rounded-3" 
+                                             style="width: 70px; height: 70px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                <a href="{{ url_for('main.product_detail', slug=item.slug) }}" class="text-dark text-decoration-none">
+                                                    {{ item.name }}
+                                                </a>
+                                            </h6>
+                                            <div class="small text-muted">
+                                                <span class="badge bg-light text-secondary border">Size: {{ item.size }}</span>
+                                                <span class="badge bg-light text-secondary border ms-1">Màu: {{ item.color }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-medium">{{ item.price | currency }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <!-- Giảm -->
+                                        <form action="{{ url_for('cart.update_cart') }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="item_key" value="{{ item_key }}">
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0">-</button>
+                                        </form>
+
+                                        <span class="px-2 fw-bold">{{ item.quantity }}</span>
+
+                                        <!-- Tăng -->
+                                        <form action="{{ url_for('cart.update_cart') }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="item_key" value="{{ item_key }}">
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0">+</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-danger">{{ (item.price * item.quantity) | currency }}</td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('cart.remove_from_cart', item_key=item_key) }}" class="text-danger" title="Xóa món đồ">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                    <a href="{{ url_for('main.shop') }}" class="btn btn-outline-dark rounded-pill btn-sm px-3">
+                        <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
+                    </a>
+                    <a href="{{ url_for('cart.clear_cart') }}" class="btn btn-outline-danger rounded-pill btn-sm px-3" onclick="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?');">
+                        <i class="bi bi-trash3 me-1"></i> Xóa sạch giỏ hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tóm tắt đơn hàng & Checkout -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold mb-3">Tóm Tắt Đơn Hàng</h5>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Tạm tính:</span>
+                    <span class="fw-semibold">{{ total_amount | currency }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Phí vận chuyển:</span>
+                    <span class="text-success fw-semibold">
+                        {% if total_amount >= 500000 %}
+                            Miễn phí
+                        {% else %}
+                            30.000 đ
+                        {% endif %}
+                    </span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fs-5 fw-bold">Tổng thanh toán:</span>
+                    <span class="fs-4 fw-extrabold text-danger">
+                        {% if total_amount >= 500000 %}
+                            {{ total_amount | currency }}
+                        {% else %}
+                            {{ (total_amount + 30000) | currency }}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <a href="{{ url_for('cart.checkout') }}" class="btn btn-primary btn-lg rounded-pill w-100 fw-bold shadow">
+                    Tiến Hành Đặt Hàng <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+
+                <div class="mt-3 p-3 bg-light rounded-3 small text-muted">
+                    <i class="bi bi-shield-check text-success me-1"></i> Thanh toán an toàn qua VietQR hoặc thanh toán tiền mặt khi nhận hàng (COD).
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+        <div class="mb-3">
+            <i class="bi bi-cart-x fs-1 text-muted"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Giỏ hàng của bạn đang trống</h4>
+        <p class="text-muted mb-4">Hãy dạo một vòng cửa hàng để chọn những món đồ thời trang yêu thích nhé!</p>
+        <div>
+            <a href="{{ url_for('main.shop') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-medium">
+                Khám phá cửa hàng ngay
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

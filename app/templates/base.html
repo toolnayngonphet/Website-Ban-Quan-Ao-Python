@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FASHION STORE - Cửa Hàng Thời Trang Hiện Đại{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="bg-dark text-white py-1 small">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <i class="bi bi-truck me-1"></i> Miễn phí vận chuyển cho đơn hàng từ 500.000đ
+                <span class="mx-2">|</span>
+                <i class="bi bi-telephone me-1"></i> Hotline: 1900 8888
+            </div>
+            <div>
+                <a href="{{ url_for('api.get_products') }}" target="_blank" class="text-white text-decoration-none me-3">
+                    <i class="bi bi-code-slash me-1"></i> REST API (CLO3)
+                </a>
+                <span class="badge bg-danger">Ưu đãi giảm đến 30%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 text-primary d-flex align-items-center" href="{{ url_for('main.index') }}">
+                <i class="bi bi-bag-heart-fill me-2 text-danger"></i>
+                <span class="text-dark">FASHION</span><span class="text-primary">STORE</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.shop') }}">Cửa Hàng</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Danh Mục
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0">
+                            {% for cat in header_categories %}
+                            <li>
+                                <a class="dropdown-menu-item dropdown-item py-2" href="{{ url_for('main.shop', category=cat.slug) }}">
+                                    {{ cat.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-primary" href="{{ url_for('main.shop') }}">Xem tất cả sản phẩm &rarr;</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.about') }}">Giới Thiệu</a>
+                    </li>
+                </ul>
+
+                <!-- Form tìm kiếm -->
+                <form class="d-flex me-3 search-form" action="{{ url_for('main.shop') }}" method="GET">
+                    <div class="input-group">
+                        <input class="form-control rounded-start-pill border-end-0 bg-light" type="search" name="q" placeholder="Tìm kiếm trang phục..." value="{{ request.args.get('q', '') }}">
+                        <button class="btn btn-light rounded-end-pill border-start-0 text-muted" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Giỏ hàng & Tài khoản -->
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Giỏ hàng -->
+                    <a href="{{ url_for('cart.view_cart') }}" class="btn btn-outline-dark position-relative rounded-pill px-3">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span class="ms-1 d-none d-sm-inline">Giỏ hàng</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartBadge">
+                            {{ cart_count }}
+                        </span>
+                    </a>
+
+                    <!-- Tài khoản -->
+                    {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-primary rounded-pill dropdown-toggle px-3 d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle fs-5"></i>
+                            <span class="text-truncate" style="max-width: 120px;">{{ current_user.full_name or current_user.username }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                            <li class="dropdown-header">
+                                <strong>{{ current_user.full_name or current_user.username }}</strong><br>
+                                <small class="text-muted">{{ current_user.email }}</small>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% if current_user.is_admin %}
+                            <li>
+                                <a class="dropdown-item text-danger fw-semibold" href="{{ url_for('admin.dashboard') }}">
+                                    <i class="bi bi-speedometer2 me-2"></i> Trang Quản Trị (Admin)
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('auth.profile') }}">
+                                    <i class="bi bi-person-lines-fill me-2"></i> Hồ sơ & Đơn mua
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="d-flex gap-1">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary rounded-pill px-3">Đăng nhập</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-pill px-3 d-none d-sm-inline-block">Đăng ký</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages (Thông báo hệ thống) -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center">
+                        <i class="bi bi-bag-heart-fill me-2 text-danger"></i>
+                        FASHION STORE
+                    </h5>
+                    <p class="text-white-50">Cửa hàng thời trang phong cách trẻ trung, hiện đại. Cam kết chất lượng sản phẩm chuẩn form, vải bền màu và trải nghiệm mua sắm tiện lợi với thanh toán VietQR tức thì.</p>
+                    <div class="d-flex gap-3 fs-5">
+                        <a href="#" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-tiktok"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold text-uppercase mb-3 text-light">Danh Mục</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        {% for cat in header_categories[:5] %}
+                        <li class="mb-2"><a href="{{ url_for('main.shop', category=cat.slug) }}" class="text-white-50 text-decoration-none">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-uppercase mb-3 text-light">Hỗ Trợ Khách Hàng</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2"><a href="{{ url_for('main.about') }}" class="text-white-50 text-decoration-none">Chính sách đổi trả 7 ngày</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.about') }}" class="text-white-50 text-decoration-none">Hướng dẫn chọn size quần áo</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.about') }}" class="text-white-50 text-decoration-none">Phương thức thanh toán VietQR & COD</a></li>
+                        <li class="mb-2"><a href="{{ url_for('api.get_products') }}" class="text-white-50 text-decoration-none" target="_blank">Tích hợp Lập trình mạng (CLO3)</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-uppercase mb-3 text-light">Thông Tin Đồ Án</h6>
+                    <p class="text-white-50 small mb-2"><i class="bi bi-mortarboard me-2"></i> ĐH Văn Lang - Khoa CNTT</p>
+                    <p class="text-white-50 small mb-2"><i class="bi bi-code-square me-2"></i> Lập trình Python nâng cao</p>
+                    <p class="text-white-50 small mb-2"><i class="bi bi-person-badge me-2"></i> GVHD: Ths Nguyễn Thị Mỹ Linh</p>
+                    <div class="mt-3">
+                        <span class="badge bg-secondary me-1">Flask 3.1</span>
+                        <span class="badge bg-secondary me-1">SQLite</span>
+                        <span class="badge bg-secondary me-1">VietQR API</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary mt-4 mb-3">
+            <div class="text-center text-white-50 small">
+                &copy; 2026 FASHION STORE. Đồ án học phần Lập trình Python nâng cao.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
